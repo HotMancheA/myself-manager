@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>forget-curve</artifactId>
+        <artifactId>myself-manager</artifactId>
         <groupId>com.yuman</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
@@ -56,10 +56,6 @@
                     <groupId>org.mybatis</groupId>
                     <artifactId>mybatis-spring</artifactId>
                 </exclusion>
-                <!--<exclusion>-->
-                    <!--<groupId>com.github.jsqlparser</groupId>-->
-                    <!--<artifactId>jsqlparser</artifactId>-->
-                <!--</exclusion>-->
             </exclusions>
         </dependency>
 
