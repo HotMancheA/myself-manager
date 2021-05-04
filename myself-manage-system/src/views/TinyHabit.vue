@@ -9,7 +9,7 @@
         </div>
         <div class="container">
             <div class="handle-box">
-                <el-dropdown class="tags-close-box" @command="handleTags">
+                <el-dropdown class="tags-close-box-tiny" style="margin-right: 11px;" @command="handleTags">
                     <el-button size="medium" type="primary">
                         操作菜单<i class="el-icon-arrow-down el-icon--right"></i>
                     </el-button>
@@ -365,7 +365,7 @@
         height: 40px;
     }
 
-    .tags-close-box {
+    .tags-close-box-tiny {
         position: absolute;
         right: 0;
         top: 0;

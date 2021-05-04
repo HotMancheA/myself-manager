@@ -9,7 +9,7 @@
         </div>
         <div class="container">
             <div class="handle-box">
-                <el-dropdown class="tags-close-box" @command="handleTags">
+                <el-dropdown class="tags-close-box-forget" style="margin-right: 11px;" @command="handleTags">
                     <el-button size="medium" type="primary">
                         操作菜单<i class="el-icon-arrow-down el-icon--right"></i>
                     </el-button>
@@ -325,13 +325,13 @@
         height: 40px;
     }
 
-    .tags-close-box {
+    .tags-close-box-forget {
         position: absolute;
         right: 0;
         top: 0;
         box-sizing: border-box;
         padding-top: 1px;
-        margin-right: 15px;
+        margin-right: 35px;
         text-align: center;
         width: 110px;
         height: 30px;
