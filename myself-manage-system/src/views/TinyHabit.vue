@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 记忆任务 ：学习要勤于复习，理解，联想有助于记忆 !
+                    <i class="el-icon-lx-cascades"></i> 微习惯 ：简单到不可能失败的任务——微目标 !
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -26,33 +26,46 @@
                     <el-option key="2" label="进行中" value="0"></el-option>
                     <el-option key="3" label="完成" value="1"></el-option>
                 </el-select>
-                <el-input size="medium" v-model="query.target" placeholder="任务名" class="handle-input mr10"></el-input>
+                <el-input size="medium" v-model="query.taskName" placeholder="任务名" class="handle-input mr10"></el-input>
                 <el-button size="medium" type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
-            <el-table :data="forgetData" border class="table" ref="forgetData" header-cell-class-name="table-header"
-                @selection-change="handleSelectionChange" :row-class-name="forgetCurveStyle" :max-height="400">
+            <el-table :data="tinyHabitData" border class="table" ref="tinyHabitData"
+                header-cell-class-name="table-header" @selection-change="handleSelectionChange"
+                :row-class-name="forgetCurveStyle" :max-height="400">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column prop="target" label="任务" sortable align="center"></el-table-column>
+                <el-table-column prop="taskName" label="任务名称" sortable align="center"></el-table-column>
                 <el-table-column prop="description" label="描述" align="center"></el-table-column>
-                <el-table-column prop="nextReviewTime" sortable label="下一次复习时间" align="center"></el-table-column>
+
                 <el-table-column label="状态" width="100" align="center">
                     <template #default="scope">
                         <el-tag :type="
-                                scope.row.state === 1 
+                                scope.row.punchCardState === 2 
                                     ? 'success'
-                                    : scope.row.state === 0
+                                    : scope.row.punchCardState === 1
                                     ? 'danger'
                                     : ''
-                            ">{{ scope.row.stateText }}</el-tag>
+                            ">{{ scope.row.punchCardStateText }}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column prop="orderNum" sortable label="排序" width="80" align="center"></el-table-column>
-                <el-table-column label="操作" width="180" align="center">
+
+                <el-table-column label="操作" width="260" align="center">
                     <template #default="scope">
-                        <el-button type="text" icon="el-icon-s-order" @click="getForgetItem(scope.row.id)">查看明细
+                        <el-button v-if="scope.row.punchCardState === 2" type="text" icon="el-icon-coin" @click="executeCount(scope.row.id)">
+                            打卡+1
+                        </el-button>
+                        <el-button v-if="scope.row.punchCardState === 0" type="text" icon="el-icon-coin" @click="punchCard(scope.row.id)">
+                            开始打卡
+                        </el-button>
+                        <el-button v-if="scope.row.punchCardState === 1" type="text" icon="el-icon-coin" @click="punchCard(scope.row.id)">
+                            完成打卡
+                        </el-button>
+                        <el-button type="text" icon="el-icon-s-order" @click="getTinyHabitLog(scope.row.id)">
+                            查看日志
                         </el-button>
                         <el-button type="text" icon="el-icon-delete" class="red"
-                            @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                            @click="handleDelete(scope.$index, scope.row)">
+                            删除
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -64,19 +77,15 @@
 
         <!-- 编辑弹出框 -->
         <el-dialog :title="editTitle" v-model="editVisible" width="30%" center>
-            <el-form ref="forgetForm" :model="forgetForm" label-width="60px" class="forget-form">
+            <el-form ref="forgetForm" :model="forgetForm" label-width="70px" class="forget-form">
                 <el-form-item label="id" v-show="false">
                     <el-input v-model="forgetForm.id"></el-input>
                 </el-form-item>
-                <el-form-item label="任务">
-                    <el-input v-model="forgetForm.target"></el-input>
+                <el-form-item label="任务名称">
+                    <el-input v-model="forgetForm.taskName"></el-input>
                 </el-form-item>
                 <el-form-item label="描述">
                     <el-input type="textarea" rows="5" v-model="forgetForm.description"></el-input>
-                </el-form-item>
-                <el-form-item label="排序">
-                    <el-input-number style="width: 100%;" v-model="forgetForm.orderNum" controls-position="right"
-                        :min="0" :max="100"></el-input-number>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -88,20 +97,33 @@
         </el-dialog>
 
         <!-- 弹出任务明细 -->
-        <el-dialog title="任务明细" :before-close="handleClose" v-model="forgetItemVisible" width="70%">
-            <el-table :data="forgetItemData" border :row-class-name="tableRowClassName" height="460"
+        <el-dialog title="任务日志" :before-close="handleClose" v-model="forgetItemVisible" width="70%">
+            <el-table :data="tinyHabitLogData" border :row-class-name="tableRowClassName" height="460"
                 class="forget-form">
-                <el-table-column property="target" label="任务" align="center"></el-table-column>
-                <el-table-column property="description" label="任务描述" align="center"></el-table-column>
-                <el-table-column property="cycle" label="周期" align="center"></el-table-column>
-                <el-table-column property="dateTime" label="复习时间" align="center"></el-table-column>
-                <el-table-column property="status_text" label="状态" align="center"></el-table-column>
-                <el-table-column fixed="right" label="操作" width="100" align="center">
+                <el-table-column label="状态" align="center">
                     <template #default="scope">
-                        <el-button type="text" @click="finish(scope.row)">完成</el-button>
+                        <el-tag :type="
+                                scope.row.punchCardState === 2 
+                                    ? 'success'
+                                    : scope.row.punchCardState === 1
+                                    ? 'danger'
+                                    : ''
+                            ">{{ scope.row.punchCardStateText }}</el-tag>
                     </template>
                 </el-table-column>
+                <el-table-column property="startTime" label="开始时间" align="center"></el-table-column>
+                <el-table-column property="endTime" label="结束时间" align="center"></el-table-column>
+                <el-table-column label="学习时间" width="100" align="center">
+                    <template #default="scope">
+                        {{scope.row.timeInterval}} {{scope.row.unitName}}
+                    </template>
+                </el-table-column>
+                <el-table-column property="executeCount" label="学习次数" align="center"></el-table-column>
             </el-table>
+            <div class="pagination">
+                <el-pagination background layout="total, prev, pager, next" :current-page="pageIndex"
+                    :page-size="pageSize" :total="logPageTotal" @current-change="handlePageChange"></el-pagination>
+            </div>
         </el-dialog>
 
     </div>
@@ -119,8 +141,8 @@
                     pageIndex: 1,
                     pageSize: 5
                 },
-                forgetData: [],
-                forgetItemData: [],
+                tinyHabitData: [],
+                tinyHabitLogData: [],
                 multipleSelection: [],
                 delList: [],
                 editVisible: false,
@@ -128,36 +150,37 @@
                 editTitle: '新增',
                 pageTotal: 0,
                 forgetForm: {
-                    'orderNum': 0,
-                    'state': 0
+                    'state': 1
                 },
                 idx: -1,
-                id: -1
+                id: -1,
+                pageIndex: 1,
+                pageSize: 5,
+                logPageTotal: 0
             };
         },
         created() {
-            this.getForgetData();
+            this.getTinyHabitData();
         },
         methods: {
             // 获取 easy-mock 的模拟数据
-            getForgetData() {
-                this.forgetData = [];
-                forgetApi.getForgetData('1', '10', this.query).then(res => {
+            getTinyHabitData() {
+                this.tinyHabitData = [];
+                forgetApi.getTinyHabitData('1', '10', this.query).then(res => {
+                    console.log(res);
                     this.pageTotal = res.data.pageTotal;
                     for (var i = 0; i < res.data.data.length; i++) {
                         var obj = res.data.data[i];
-                        this.forgetData.push(obj);
+                        this.tinyHabitData.push(obj);
                     }
                 });
 
             },
             // 触发搜索按钮
             handleSearch() {
-                localStorage.removeItem("ms_username");
-                window.location.href = "/";
-                
-                // window.location.href = domain + ""
-                //this.getForgetData();
+                // localStorage.removeItem("ms_username");
+                // window.location.href = "/";
+                this.getTinyHabitData();
             },
             // 删除操作
             handleDelete(index, row) {
@@ -168,11 +191,11 @@
                     .then(() => {
                         var ids = [];
                         ids.push(row.id)
-                        forgetApi.del(ids).then(res => {
+                        forgetApi.delTinyHabit(ids).then(res => {
                             console.log(res);
                         });
                         this.$message.success("删除成功");
-                        this.getForgetData();
+                        this.getTinyHabitData();
                     })
                     .catch(() => {});
             },
@@ -195,9 +218,9 @@
                         type: "warning"
                     })
                     .then(() => {
-                        forgetApi.del(ids).then(res => {
+                        forgetApi.delTinyHabit(ids).then(res => {
                             this.$message.success(res.msg);
-                            that.getForgetData();
+                            that.getTinyHabitData();
                         });
                         that.multipleSelection = [];
                     })
@@ -206,8 +229,7 @@
             handleSave() {
                 this.editVisible = true;
                 this.forgetForm = {
-                    'orderNum': 0,
-                    'state': 0
+                    'state': 1
                 };
             },
             // 编辑操作
@@ -226,18 +248,18 @@
             // 保存编辑
             saveEdit(formName) {
                 if (this.forgetForm.id === undefined) {
-                    forgetApi.generateTarget(this.forgetForm).then(res => {
+                    forgetApi.addTinyHabit(this.forgetForm).then(res => {
                         this.$message.success(res.msg);
                         this.$refs[formName].resetFields();
                         this.editVisible = false;
-                        this.getForgetData();
+                        this.getTinyHabitData();
                     });
                 } else {
-                    forgetApi.edit(this.forgetForm).then(res => {
+                    forgetApi.editTinyHabit(this.forgetForm).then(res => {
                         this.$message.success(res.msg);
                         this.$refs[formName].resetFields();
                         this.editVisible = false;
-                        this.getForgetData();
+                        this.getTinyHabitData();
                     });
                 }
 
@@ -245,7 +267,11 @@
             // 分页导航
             handlePageChange(val) {
                 this.query.pageIndex = val;
-                this.getForgetData();
+                this.getTinyHabitData();
+            }, // 日志分页导航
+            handleLogPageChange(val) {
+                this.pageIndex = val;
+                this.getTinyHabitData();
             },
             handleTags(command) {
                 if (command === 'add') {
@@ -257,16 +283,26 @@
                 }
 
             },
-            getForgetItem(id) {
-                this.forgetItemVisible = true;
-                forgetApi.getForgetItemData(id).then((res) => {
-                    this.forgetItemData = res;
-                })
+            punchCard(id) {
+                
+                forgetApi.punchCard(id).then(res => {
+                    this.$message.success(res.msg);
+                    this.getTinyHabitData();
+                });
+
             },
-            finish(row) {
-                forgetApi.finish(row.forgetCurveItemId).then((res) => {
-                    this.$message.success(res);
-                    this.getForgetItem(row.targetId);
+            executeCount(id){
+                
+                forgetApi.executeCount(id).then(res => {
+                    this.$message.success(res.msg);
+                    this.getTinyHabitData();
+                });
+            }
+            ,
+            getTinyHabitLog(id) {
+                this.forgetItemVisible = true;
+                forgetApi.getTinyHabitLogData(this.pageIndex,this.pageSize,id).then((res) => {
+                    this.tinyHabitLogData = res.data.data;
                 })
             },
             tableRowClassName({
@@ -289,7 +325,7 @@
             },
             handleClose() {
                 this.forgetItemVisible = false;
-                this.getForgetData();
+                this.getTinyHabitData();
             }
         }
     };

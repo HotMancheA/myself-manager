@@ -33,3 +33,41 @@ export const finish = (id) => {
 }
 
 // ================记忆任务 结束==================
+
+// ================微习惯 开始==================
+
+//查询
+export const getTinyHabitData = (page, size, params) => {
+    return http.requestPost(domain + "/yuman/tinyHabit/list", params);
+}
+
+//新增
+export const addTinyHabit = (param) => {
+    return http.requestPost(domain + "/yuman/tinyHabit/add", param)
+}
+
+//编辑
+export const editTinyHabit = (params) => {
+    return http.requestPost(domain + "/yuman/tinyHabit/edit", params)
+}
+
+//删除
+export const delTinyHabit = (ids) => {
+    return http.requestPost(domain + "/yuman/tinyHabit/del", ids);
+}
+
+//查询任务日志
+export const getTinyHabitLogData = (pageIndex, pageSize, id) => {
+    return http.requestQuickGet(domain + "/yuman/tinyHabit/listLog?id=" + id + "&pageIndex=" + pageIndex +
+        "&pageSize=" + pageSize);
+}
+
+//打卡
+export const punchCard = (id) => {
+    return http.requestQuickGet(domain + "/yuman/tinyHabit/punchCard?id=" + id)
+}
+
+//打卡 +1
+export const executeCount = (id) => {
+    return http.requestQuickGet(domain + "/yuman/tinyHabit/executeCount?id=" + id)
+}
