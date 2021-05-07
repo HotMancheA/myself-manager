@@ -165,10 +165,10 @@
                         var ids = [];
                         ids.push(row.id)
                         forgetApi.del(ids).then(res => {
-                            console.log(res);
+                            this.$message.success(res.msg);
+                            this.getForgetData();
                         });
-                        this.$message.success("删除成功");
-                        this.getForgetData();
+                       
                     })
                     .catch(() => {});
             },

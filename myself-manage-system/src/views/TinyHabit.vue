@@ -50,16 +50,19 @@
 
                 <el-table-column label="操作" width="260" align="center">
                     <template #default="scope">
-                        <el-button v-if="scope.row.punchCardState === 2" type="text" icon="el-icon-coin" @click="executeCount(scope.row.id)">
+                        <el-button v-if="scope.row.punchCardState === 2" type="text" icon="el-icon-coin"
+                            @click="executeCount(scope.row.id)">
                             打卡+1
                         </el-button>
-                        <el-button v-if="scope.row.punchCardState === 0" type="text" icon="el-icon-coin" @click="punchCard(scope.row.id)">
+                        <el-button v-if="scope.row.punchCardState === 0" type="text" icon="el-icon-coin"
+                            @click="punchCard(scope.row.id)">
                             开始打卡
                         </el-button>
-                        <el-button v-if="scope.row.punchCardState === 1" type="text" icon="el-icon-coin" @click="punchCard(scope.row.id)">
+                        <el-button v-if="scope.row.punchCardState === 1" type="text" icon="el-icon-coin"
+                            @click="punchCard(scope.row.id)">
                             完成打卡
                         </el-button>
-                        <el-button type="text" icon="el-icon-s-order" @click="getTinyHabitLog(scope.row.id)">
+                        <el-button type="text" icon="el-icon-s-order" class="tiny-item" @click="getTinyHabitLog(scope.row.id)">
                             查看日志
                         </el-button>
                         <el-button type="text" icon="el-icon-delete" class="red"
@@ -192,10 +195,10 @@
                         var ids = [];
                         ids.push(row.id)
                         forgetApi.delTinyHabit(ids).then(res => {
-                            console.log(res);
+                            this.$message.success(res.msg);
+                            this.getTinyHabitData();
                         });
-                        this.$message.success("删除成功");
-                        this.getTinyHabitData();
+
                     })
                     .catch(() => {});
             },
@@ -284,24 +287,23 @@
 
             },
             punchCard(id) {
-                
+
                 forgetApi.punchCard(id).then(res => {
                     this.$message.success(res.msg);
                     this.getTinyHabitData();
                 });
 
             },
-            executeCount(id){
-                
+            executeCount(id) {
+
                 forgetApi.executeCount(id).then(res => {
                     this.$message.success(res.msg);
                     this.getTinyHabitData();
                 });
-            }
-            ,
+            },
             getTinyHabitLog(id) {
                 this.forgetItemVisible = true;
-                forgetApi.getTinyHabitLogData(this.pageIndex,this.pageSize,id).then((res) => {
+                forgetApi.getTinyHabitLogData(this.pageIndex, this.pageSize, id).then((res) => {
                     this.tinyHabitLogData = res.data.data;
                 })
             },
@@ -352,6 +354,10 @@
 
     .red {
         color: #ff0000;
+    }
+
+    .tiny-item {
+        color: #996633;
     }
 
     .mr10 {
