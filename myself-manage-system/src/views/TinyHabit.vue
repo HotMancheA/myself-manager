@@ -62,7 +62,8 @@
                             @click="punchCard(scope.row.id)">
                             完成打卡
                         </el-button>
-                        <el-button type="text" icon="el-icon-s-order" class="tiny-item" @click="getTinyHabitLog(scope.row.id)">
+                        <el-button type="text" icon="el-icon-s-order" class="tiny-item"
+                            @click="getTinyHabitLog(scope.row.id)">
                             查看日志
                         </el-button>
                         <el-button type="text" icon="el-icon-delete" class="red"
@@ -101,6 +102,11 @@
 
         <!-- 弹出任务明细 -->
         <el-dialog title="任务日志" :before-close="handleClose" v-model="forgetItemVisible" width="70%">
+            <div class="tiny-log-label">
+                <span>微习惯已创建 : <el-tag class="tiny-log-tag" size="medium" >{{totalDay}}&nbsp;天</el-tag></span> 
+                 <span>未打卡 : <el-tag class="tiny-log-tag" size="medium" type="danger">{{totalDay - punchCardDay}}&nbsp;天</el-tag></span> 
+                <span>已打卡 : <el-tag class="tiny-log-tag" size="medium" type="success">{{punchCardDay}}&nbsp;天</el-tag></span> 
+            </div>
             <el-table :data="tinyHabitLogData" border :row-class-name="tableRowClassName" height="460"
                 class="forget-form">
                 <el-table-column label="状态" align="center">
@@ -159,7 +165,9 @@
                 id: -1,
                 pageIndex: 1,
                 pageSize: 5,
-                logPageTotal: 0
+                logPageTotal: 0,
+                totalDay: 0,
+                punchCardDay: 0
             };
         },
         created() {
@@ -170,7 +178,7 @@
             getTinyHabitData() {
                 this.tinyHabitData = [];
                 forgetApi.getTinyHabitData('1', '10', this.query).then(res => {
-                    console.log(res);
+                   
                     this.pageTotal = res.data.pageTotal;
                     for (var i = 0; i < res.data.data.length; i++) {
                         var obj = res.data.data[i];
@@ -304,7 +312,9 @@
             getTinyHabitLog(id) {
                 this.forgetItemVisible = true;
                 forgetApi.getTinyHabitLogData(this.pageIndex, this.pageSize, id).then((res) => {
-                    this.tinyHabitLogData = res.data.data;
+                    this.tinyHabitLogData = res.data.data.data;
+                    this.totalDay = res.data.totalDay;
+                    this.punchCardDay = res.data.punchCardDay;
                 })
             },
             tableRowClassName({
@@ -397,4 +407,19 @@
     /deep/ .el-table .success-row {
         background: #f0f9eb;
     }
+    
+    .tiny-log-label {
+        margin-bottom: 10px;
+        font-size: 16px;
+        
+    }
+    
+    .tiny-log-label span {
+        margin-right: 15px;
+    }
+    
+    .tiny-log-tag {
+        font-size: 16px;
+    }
+    
 </style>

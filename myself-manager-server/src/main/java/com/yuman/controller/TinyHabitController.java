@@ -11,6 +11,7 @@ import com.yuman.mapper.TinyHabitMapper;
 import com.yuman.model.MemoryTaskModel;
 import com.yuman.model.PageModel;
 import com.yuman.model.TinyHabitModel;
+import com.yuman.model.TinyLogModel;
 import com.yuman.model.query.TinyHabitQuery;
 import com.yuman.model.response.BaseResponse;
 import com.yuman.repository.TinyHabitLogRepository;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -65,18 +67,53 @@ public class TinyHabitController {
         Page<TinyHabitLog> page = PageHelper.startPage(pageIndex, pageSize);
         QueryWrapper<TinyHabitLog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("tiny_habit_id", id);
+        queryWrapper.orderByDesc("start_time");
         tinyHabitLogMapper.selectList(queryWrapper);
         List<TinyHabitLog> collect = page.getResult().stream().map(o -> convertLog(o)).collect(Collectors.toList());
         PageModel<List<TinyHabitLog>> listPageModel = PageUtil.convertPage(page, collect);
-        return BaseResponse.ok(listPageModel);
+        int day = 0;
+        if (collect.size() > 0) {
+            day = daysBetween(collect.get(collect.size() - 1).getStartTime(), new Date());
+        }
+        List<TinyHabitLog> punchCardList = collect.stream().filter(o -> convertPunchCard(o)).collect(Collectors.toList());
+        TinyLogModel tinyLogModel = new TinyLogModel();
+        tinyLogModel.setTotalDay(day);
+        tinyLogModel.setPunchCardDay(punchCardList.size());
+        tinyLogModel.setData(listPageModel);
+        return BaseResponse.ok(tinyLogModel);
     }
 
-    public TinyHabitLog convertLog(TinyHabitLog tinyHabitLog){
-        if (tinyHabitLog.getPunchCardState() == 0){
+    private boolean convertPunchCard(TinyHabitLog o) {
+        if(o.getStartTime() == null || o.getEndTime() == null){
+            return false;
+        }
+        return true;
+    }
+
+    public static int daysBetween(Date sendDate, Date startDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            sendDate = sdf.parse(sdf.format(sendDate));
+            startDate = sdf.parse(sdf.format(startDate));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(sendDate);
+        long time1 = cal.getTimeInMillis();
+        cal.setTime(startDate);
+        long time2 = cal.getTimeInMillis();
+        long between_days = (time2 - time1) / (1000 * 3600 * 24);
+        return Integer.parseInt(String.valueOf(between_days));
+    }
+
+
+    public TinyHabitLog convertLog(TinyHabitLog tinyHabitLog) {
+        if (tinyHabitLog.getPunchCardState() == 0) {
             tinyHabitLog.setPunchCardStateText("未打卡");
-        }else if(tinyHabitLog.getPunchCardState() == 1){
+        } else if (tinyHabitLog.getPunchCardState() == 1) {
             tinyHabitLog.setPunchCardStateText("打卡中");
-        }else if(tinyHabitLog.getPunchCardState() == 2){
+        } else if (tinyHabitLog.getPunchCardState() == 2) {
             tinyHabitLog.setPunchCardStateText("打卡完成");
         }
         return tinyHabitLog;
@@ -86,7 +123,7 @@ public class TinyHabitController {
     @GetMapping("/punchCard")
     public BaseResponse<?> punchCard(String id) {
         String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        TinyHabitLog tinyHabitLog = tinyHabitLogRepository.findByStartTime(today,id);
+        TinyHabitLog tinyHabitLog = tinyHabitLogRepository.findByStartTime(today, id);
         if (tinyHabitLog == null) {
             tinyHabitLog = new TinyHabitLog();
             tinyHabitLog.setPunchCardState(1);
@@ -106,8 +143,8 @@ public class TinyHabitController {
     @GetMapping("/executeCount")
     public BaseResponse<?> executeCount(String id) {
         String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        TinyHabitLog tinyHabitLog = tinyHabitLogRepository.findByStartTime(today,id);
-        tinyHabitLog.setExecuteCount(tinyHabitLog.getExecuteCount()+1);
+        TinyHabitLog tinyHabitLog = tinyHabitLogRepository.findByStartTime(today, id);
+        tinyHabitLog.setExecuteCount(tinyHabitLog.getExecuteCount() + 1);
         tinyHabitLogRepository.save(tinyHabitLog);
         return BaseResponse.ok();
     }
@@ -121,7 +158,7 @@ public class TinyHabitController {
         int hour = instance.get(Calendar.HOUR);
         int startMinute = startCalendar.get(Calendar.MINUTE);
         int minute = instance.get(Calendar.MINUTE);
-        Integer time = (hour - startHour)*60 + (minute - startMinute);
+        Integer time = (hour - startHour) * 60 + (minute - startMinute);
         return time;
     }
 
@@ -156,7 +193,7 @@ public class TinyHabitController {
         tinyHabitModel.setTaskName(tinyHabit.getTaskName());
         tinyHabitModel.setState(tinyHabit.getState());
         String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        TinyHabitLog tinyHabitLog = tinyHabitLogRepository.findByStartTime(today,tinyHabit.getId());
+        TinyHabitLog tinyHabitLog = tinyHabitLogRepository.findByStartTime(today, tinyHabit.getId());
         tinyHabitModel.setPunchCardState(0);
         tinyHabitModel.setPunchCardStateText("未打卡");
         if (tinyHabitLog != null) {
@@ -165,7 +202,7 @@ public class TinyHabitController {
         } else {
             return tinyHabitModel;
         }
-        Integer endTime = tinyHabitLogRepository.findByEndTime(today,tinyHabit.getId());
+        Integer endTime = tinyHabitLogRepository.findByEndTime(today, tinyHabit.getId());
         if (endTime != 0) {
             tinyHabitModel.setPunchCardState(2);
             tinyHabitModel.setPunchCardStateText("打卡完成");
