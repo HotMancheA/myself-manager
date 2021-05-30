@@ -106,6 +106,7 @@
                 <span>微习惯已创建 : <el-tag class="tiny-log-tag" size="medium" >{{totalDay}}&nbsp;天</el-tag></span> 
                  <span>未打卡 : <el-tag class="tiny-log-tag" size="medium" type="danger">{{totalDay - punchCardDay}}&nbsp;天</el-tag></span> 
                 <span>已打卡 : <el-tag class="tiny-log-tag" size="medium" type="success">{{punchCardDay}}&nbsp;天</el-tag></span> 
+              
             </div>
             <el-table :data="tinyHabitLogData" border :row-class-name="tableRowClassName" height="460"
                 class="forget-form">
@@ -131,7 +132,7 @@
             </el-table>
             <div class="pagination">
                 <el-pagination background layout="total, prev, pager, next" :current-page="pageIndex"
-                    :page-size="pageSize" :total="logPageTotal" @current-change="handlePageChange"></el-pagination>
+                    :page-size="pageSize" :total="logPageTotal" @current-change="handleLogPageChange"></el-pagination>
             </div>
         </el-dialog>
 
@@ -168,6 +169,7 @@
                 logPageTotal: 0,
                 totalDay: 0,
                 punchCardDay: 0
+               
             };
         },
         created() {
@@ -282,7 +284,7 @@
             }, // 日志分页导航
             handleLogPageChange(val) {
                 this.pageIndex = val;
-                this.getTinyHabitData();
+                this.getTinyHabitLog(this.tinyHabitId);
             },
             handleTags(command) {
                 if (command === 'add') {
@@ -310,8 +312,10 @@
                 });
             },
             getTinyHabitLog(id) {
+                this.tinyHabitId = id;
                 this.forgetItemVisible = true;
                 forgetApi.getTinyHabitLogData(this.pageIndex, this.pageSize, id).then((res) => {
+                    this.logPageTotal = res.data.pageTotal;
                     this.tinyHabitLogData = res.data.data.data;
                     this.totalDay = res.data.totalDay;
                     this.punchCardDay = res.data.punchCardDay;

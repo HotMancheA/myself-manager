@@ -64,22 +64,29 @@ public class TinyHabitController {
 
     @GetMapping("/listLog")
     public BaseResponse listLog(Integer pageIndex, Integer pageSize, String id) {
-        Page<TinyHabitLog> page = PageHelper.startPage(pageIndex, pageSize);
         QueryWrapper<TinyHabitLog> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("tiny_habit_id", id);
         queryWrapper.orderByDesc("start_time");
+        List<TinyHabitLog> tinyHabitLogs = tinyHabitLogMapper.selectList(queryWrapper);
+
+
+        Page<TinyHabitLog> page = PageHelper.startPage(pageIndex, pageSize);
+
         tinyHabitLogMapper.selectList(queryWrapper);
         List<TinyHabitLog> collect = page.getResult().stream().map(o -> convertLog(o)).collect(Collectors.toList());
         PageModel<List<TinyHabitLog>> listPageModel = PageUtil.convertPage(page, collect);
         int day = 0;
         if (collect.size() > 0) {
-            day = daysBetween(collect.get(collect.size() - 1).getStartTime(), new Date());
+            day = daysBetween(tinyHabitLogs.get(tinyHabitLogs.size() - 1).getStartTime(), new Date());
         }
-        List<TinyHabitLog> punchCardList = collect.stream().filter(o -> convertPunchCard(o)).collect(Collectors.toList());
+        List<TinyHabitLog> punchCardList = tinyHabitLogs.stream().filter(o -> convertPunchCard(o)).collect(Collectors.toList());
         TinyLogModel tinyLogModel = new TinyLogModel();
         tinyLogModel.setTotalDay(day);
         tinyLogModel.setPunchCardDay(punchCardList.size());
         tinyLogModel.setData(listPageModel);
+        tinyLogModel.setPageIndex(listPageModel.getPageIndex());
+        tinyLogModel.setPageSize(listPageModel.getPageSize());
+        tinyLogModel.setPageTotal(listPageModel.getPageTotal());
         return BaseResponse.ok(tinyLogModel);
     }
 
@@ -103,7 +110,7 @@ public class TinyHabitController {
         long time1 = cal.getTimeInMillis();
         cal.setTime(startDate);
         long time2 = cal.getTimeInMillis();
-        long between_days = (time2 - time1) / (1000 * 3600 * 24);
+        long between_days = (time2 - time1) / (1000 * 3600 * 24) + 1;
         return Integer.parseInt(String.valueOf(between_days));
     }
 
