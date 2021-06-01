@@ -1,7 +1,7 @@
 import http from '../utils/request';
 
-// const domain = 'http://localhost:9990';
-const domain = 'http://120.78.67.40:9990';
+const domain = 'http://localhost:9990';
+// const domain = 'http://120.78.67.40:9990';
 
 export const login = (username, password) => {
     return http.requestQuickGet(domain + "/yuman/account/login?username=" + username + "&password=" + password)
@@ -70,4 +70,28 @@ export const punchCard = (id) => {
 //打卡 +1
 export const executeCount = (id) => {
     return http.requestQuickGet(domain + "/yuman/tinyHabit/executeCount?id=" + id)
+}
+
+// ================微习惯 结束==================
+
+// ================学习时长 开始==================
+
+//查询
+export const getLearnTimeData = (page, size, params) => {
+    return http.requestPost(domain + "/yuman/learnTime/list", params);
+}
+
+//新增
+export const addLearnTime = (param) => {
+    return http.requestPost(domain + "/yuman/learnTime/add", param)
+}
+
+//编辑
+export const editLearnTime = (params) => {
+    return http.requestPost(domain + "/yuman/learnTime/edit", params)
+}
+
+//删除
+export const delLearnTime = (ids) => {
+    return http.requestPost(domain + "/yuman/learnTime/del", ids);
 }

@@ -1,5 +1,6 @@
 package com.yuman.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -28,5 +29,11 @@ public class LearnTime {
      */
     @Column(name = "learn_time")
     private Integer learnTime;
+
+
+
+    @TableField(exist = false)
+    @Transient
+    private String learnTimeText;
 
 }

@@ -51,11 +51,21 @@ public class LearnTimeController {
         }
         learnTimeMapper.selectList(queryWrapper);
         List<LearnTime> collect = page.getResult();
-        PageModel<List<LearnTime>> listPageModel = PageUtil.convertPage(page, collect);
+        PageModel<List<LearnTime>> listPageModel = PageUtil.convertPage(page, collect.stream().map(o -> convert(o)).collect(Collectors.toList()));
         return BaseResponse.ok(listPageModel);
     }
 
-
+    private LearnTime convert(LearnTime learnTime){
+        Integer time = learnTime.getLearnTime();
+        Integer hour = time / 60;
+        Integer minute = time % 60;
+        if(hour == 0){
+            learnTime.setLearnTimeText("已学习："+minute+"分钟");
+        }else {
+            learnTime.setLearnTimeText("已学习："+hour+"小时"+minute+"分钟");
+        }
+        return learnTime;
+    }
 
     @PostMapping("/add")
     public BaseResponse<?> add(@RequestBody LearnTime learnTime) {

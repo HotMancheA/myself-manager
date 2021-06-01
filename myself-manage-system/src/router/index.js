@@ -39,6 +39,15 @@ const routes = [{
             /* webpackChunkName: "table" */
             "../views/TinyHabit.vue")
     }, {
+        path: "/learnTime",
+        name: "learnTime",
+        meta: {
+            title: '学习时长'
+        },
+        component: () => import(
+            /* webpackChunkName: "table" */
+            "../views/LearnTime.vue")
+    }, {
         path: "/charts",
         name: "basecharts",
         meta: {
