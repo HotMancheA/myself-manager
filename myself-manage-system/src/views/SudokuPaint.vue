@@ -3,7 +3,7 @@
         <div class="crumbs">
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item>
-                    <i class="el-icon-lx-cascades"></i> 学习时长 ：输入的知识是营养，输出的知识才是你自己的！
+                    <i class="el-icon-lx-cascades"></i> 阴阳形九宫格 ：阴阳形寻找形，九宫格修细形，组合确定形状！
                 </el-breadcrumb-item>
             </el-breadcrumb>
         </div>
@@ -26,11 +26,11 @@
                 <el-button size="medium" type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
             <el-table :data="learnTimeData" border class="table" ref="learnTimeData"
-                header-cell-class-name="table-header" @selection-change="handleSelectionChange" >
+                header-cell-class-name="table-header" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="learnName" label="学习名称" sortable align="center"></el-table-column>
-                <el-table-column prop="learnTimeText" label="学习时长(时、分)" align="center"></el-table-column>
-                <el-table-column prop="learnTime" label="学习时长(分)" align="center"></el-table-column>
+                <el-table-column prop="learnTime" label="学习时长" v-show="false" align="center"></el-table-column>
+                <el-table-column prop="learnTimeText" label="学习时长" align="center"></el-table-column>
                 <el-table-column label="操作" width="260" align="center">
                     <template #default="scope">
                         <el-button type="text" icon="el-icon-s-order" class="tiny-item"
@@ -120,7 +120,7 @@
                 minute: 0,
                 second: 0,
                 time: 0,
-                row: {}
+                row : {}
             };
         },
         created() {
@@ -253,7 +253,7 @@
                     this.minute = 0;
                     this.hour++;
                 }
-
+                
             },
             closeInterval() {
                 this.time = window.clearInterval(this.time);
@@ -267,7 +267,7 @@
                     this.minute = 0;
                     this.hour = 0;
                 });
-
+                
             }
         }
     };

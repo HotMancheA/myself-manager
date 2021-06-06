@@ -4,6 +4,8 @@ import {
 } from "vue-router";
 import Home from "../views/Home.vue";
 
+
+
 const routes = [{
     path: '/',
     redirect: '/dashboard'
@@ -47,6 +49,15 @@ const routes = [{
         component: () => import(
             /* webpackChunkName: "table" */
             "../views/LearnTime.vue")
+    }, {
+        path: "/sudokuPaint",
+        name: "sudokuPaint",
+        meta: {
+            title: '阴阳形九宫格'
+        },
+        component: () => import(
+            /* webpackChunkName: "table" */
+            "../views/SudokuPaint.vue")
     }, {
         path: "/charts",
         name: "basecharts",
@@ -148,15 +159,46 @@ const routes = [{
         "../views/Login.vue")
 }];
 
-const router = createRouter({
+
+export const meta = [{
+        icon: "el-icon-lx-home",
+        index: "dashboard",
+        title: "系统首页"
+    },
+    {
+        icon: "el-icon-lx-cascades",
+        index: "table",
+        title: "记忆任务"
+    },
+    {
+        icon: "el-icon-lx-copy",
+        index: "tinyHabit",
+        title: "微习惯"
+    },
+    {
+        icon: "el-icon-time",
+        index: "learnTime",
+        title: "学习时长"
+    }, {
+        icon: "el-icon-s-cooperation",
+        index: "learnTool",
+        title: "学习工具",
+        subs: [{
+            icon: "el-icon-s-grid",
+            index: "sudokuPaint",
+            title: "阴阳形九宫格"
+        }]
+    }
+];
+//SudokuPaint
+export const router = createRouter({
     history: createWebHistory(process.env.BASE_URL),
     routes
 });
 
 router.beforeEach((to, from, next) => {
-    document.title = `${to.meta.title} | vue-manage-system`;
+    document.title = `${to.meta.title} | myself-manager`;
     var role = localStorage.getItem('ms_username');
-
     if (!role && to.path !== '/login') {
         next('/login');
     } else if (to.meta.permission) {
@@ -168,5 +210,3 @@ router.beforeEach((to, from, next) => {
         next();
     }
 });
-
-export default router;

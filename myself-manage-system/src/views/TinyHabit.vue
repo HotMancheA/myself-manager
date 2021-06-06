@@ -31,7 +31,7 @@
             </div>
             <el-table :data="tinyHabitData" border class="table" ref="tinyHabitData"
                 header-cell-class-name="table-header" @selection-change="handleSelectionChange"
-                :row-class-name="forgetCurveStyle" :max-height="400">
+                :row-class-name="forgetCurveStyle" >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="taskName" label="任务名称" sortable align="center"></el-table-column>
                 <el-table-column prop="description" label="描述" align="center"></el-table-column>
@@ -149,7 +149,7 @@
                     state: "",
                     target: "",
                     pageIndex: 1,
-                    pageSize: 5
+                    pageSize: 10
                 },
                 tinyHabitData: [],
                 tinyHabitLogData: [],

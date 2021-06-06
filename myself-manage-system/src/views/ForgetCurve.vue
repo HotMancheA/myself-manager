@@ -30,7 +30,7 @@
                 <el-button size="medium" type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
             <el-table :data="forgetData" border class="table" ref="forgetData" header-cell-class-name="table-header"
-                @selection-change="handleSelectionChange" :row-class-name="forgetCurveStyle" :max-height="400">
+                @selection-change="handleSelectionChange" :row-class-name="forgetCurveStyle" >
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="target" label="任务" sortable align="center"></el-table-column>
                 <el-table-column prop="description" label="描述" align="center"></el-table-column>
@@ -89,7 +89,7 @@
 
         <!-- 弹出任务明细 -->
         <el-dialog title="任务明细" :before-close="handleClose" v-model="forgetItemVisible" width="70%">
-            <el-table :data="forgetItemData" border :row-class-name="tableRowClassName" height="460"
+            <el-table :data="forgetItemData" border :row-class-name="tableRowClassName" height="505px"
                 class="forget-form">
                 <el-table-column property="target" label="任务" align="center"></el-table-column>
                 <el-table-column property="description" label="任务描述" align="center"></el-table-column>
@@ -117,7 +117,7 @@
                     state: "",
                     target: "",
                     pageIndex: 1,
-                    pageSize: 5
+                    pageSize: 10
                 },
                 forgetData: [],
                 forgetItemData: [],

@@ -1,7 +1,7 @@
 import http from '../utils/request';
 
 const domain = 'http://localhost:9990';
-// const domain = 'http://120.78.67.40:9990';
+ // const domain = 'http://120.78.67.40:9990';
 
 export const login = (username, password) => {
     return http.requestQuickGet(domain + "/yuman/account/login?username=" + username + "&password=" + password)

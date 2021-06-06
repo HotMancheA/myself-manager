@@ -11,11 +11,17 @@
                         </template>
                         <template v-for="subItem in item.subs">
                             <el-submenu v-if="subItem.subs" :index="subItem.index" :key="subItem.index">
-                                <template #title>{{ subItem.title }}</template>
+                                <template #title>
+                                    <i :class="subItem.icon"></i>
+                                    <span>{{ subItem.title }}</span>
+                                </template>
                                 <el-menu-item v-for="(threeItem, i) in subItem.subs" :key="i" :index="threeItem.index">
-                                    {{ threeItem.title }}</el-menu-item>
+                                    {{ threeItem.title }}
+                                </el-menu-item>
                             </el-submenu>
-                            <el-menu-item v-else :index="subItem.index" :key="subItem.index">{{ subItem.title }}
+                            <el-menu-item v-else :index="subItem.index" :key="subItem.index">
+                                <i :class="subItem.icon"></i>
+                                <span>{{ subItem.title }}</span>
                             </el-menu-item>
                         </template>
                     </el-submenu>
@@ -32,31 +38,20 @@
 </template>
 
 <script>
+    import {
+        meta
+    } from '../router'
+
     export default {
         data() {
             return {
-                items: [{
-                        icon: "el-icon-lx-home",
-                        index: "dashboard",
-                        title: "系统首页"
-                    },
-                    {
-                        icon: "el-icon-lx-cascades",
-                        index: "table",
-                        title: "记忆任务"
-                    },
-                    {
-                        icon: "el-icon-lx-copy",
-                        index: "tinyHabit",
-                        title: "微习惯"
-                    },
-                    {
-                        icon: "el-icon-time",
-                        index: "learnTime",
-                        title: "学习时长"
-                    }
-                ]
+                items: []
             };
+        },
+        created() {
+
+            this.items = meta;
+
         },
         computed: {
             onRoutes() {
