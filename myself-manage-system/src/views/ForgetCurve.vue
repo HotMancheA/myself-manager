@@ -30,7 +30,7 @@
                 <el-button size="medium" type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
             <el-table :data="forgetData" border class="table" ref="forgetData" header-cell-class-name="table-header"
-                @selection-change="handleSelectionChange" :row-class-name="forgetCurveStyle" >
+                @selection-change="handleSelectionChange" :row-class-name="forgetCurveStyle">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="target" label="任务" sortable align="center"></el-table-column>
                 <el-table-column prop="description" label="描述" align="center"></el-table-column>
@@ -47,9 +47,11 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="orderNum" sortable label="排序" width="80" align="center"></el-table-column>
-                <el-table-column label="操作" width="180" align="center">
+                <el-table-column label="操作" width="260" align="center">
                     <template #default="scope">
-                        <el-button type="text" icon="el-icon-s-order" @click="getForgetItem(scope.row.id)">查看明细
+                        <el-button type="text" icon="el-icon-watch" @click="fourReview(scope.row.id)">四次复习
+                        </el-button>
+                        <el-button type="text" icon="el-icon-s-order" @click="getForgetItem(scope.row.id)">七次复习
                         </el-button>
                         <el-button type="text" icon="el-icon-delete" class="red"
                             @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -144,12 +146,12 @@
                 this.forgetData = [];
                 forgetApi.getForgetData('1', '10', this.query).then(res => {
                     this.pageTotal = res.data.pageTotal;
-                    for(var i = 0; i < res.data.data.length ; i++){
-                        var obj  = res.data.data[i];         
+                    for (var i = 0; i < res.data.data.length; i++) {
+                        var obj = res.data.data[i];
                         this.forgetData.push(obj);
                     }
                 });
-               
+
             },
             // 触发搜索按钮
             handleSearch() {
@@ -168,7 +170,7 @@
                             this.$message.success(res.msg);
                             this.getForgetData();
                         });
-                       
+
                     })
                     .catch(() => {});
             },
@@ -252,6 +254,10 @@
                     this.delAllSelection();
                 }
 
+            },
+            fourReview(id) {
+                
+this.$message.success(id);
             },
             getForgetItem(id) {
                 this.forgetItemVisible = true;

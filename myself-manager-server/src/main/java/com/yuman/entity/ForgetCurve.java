@@ -24,6 +24,9 @@ public class ForgetCurve {
     //状态
     private Integer state;
 
+//    //四次复习状态
+//    private Integer fourReviewState;
+
     @Column(name = "order_num")
     private Integer orderNum;
 

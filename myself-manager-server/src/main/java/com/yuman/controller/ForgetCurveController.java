@@ -6,13 +6,16 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.yuman.entity.ForgetCurve;
 import com.yuman.entity.ForgetCurveItem;
+import com.yuman.entity.FourReview;
 import com.yuman.model.ForgetCurveModel;
+import com.yuman.model.FourReviewModel;
 import com.yuman.model.MemoryTaskModel;
 import com.yuman.model.PageModel;
 import com.yuman.model.query.ForgetQuery;
 import com.yuman.model.response.BaseResponse;
 import com.yuman.repository.ForgetCurveItemRepository;
 import com.yuman.repository.ForgetCurveRepository;
+import com.yuman.repository.FourReviewRepository;
 import com.yuman.service.ForgetCurveService;
 import com.yuman.utils.PageUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -30,13 +33,16 @@ import java.util.stream.Collectors;
 public class ForgetCurveController {
 
     @Autowired
-    ForgetCurveRepository forgetCurveRepository;
+    private ForgetCurveRepository forgetCurveRepository;
 
     @Autowired
-    ForgetCurveItemRepository forgetCurveItemRepository;
+    private ForgetCurveItemRepository forgetCurveItemRepository;
 
     @Autowired
-    ForgetCurveService forgetCurveService;
+    private ForgetCurveService forgetCurveService;
+
+    @Autowired
+    private FourReviewRepository fourReviewRepository;
 
     /**
      * 生成记忆任务
@@ -49,6 +55,7 @@ public class ForgetCurveController {
     public BaseResponse generateTarget(@RequestBody ForgetCurve forgetCurve) {
         ForgetCurve save = forgetCurveRepository.save(forgetCurve);
         generateForgetCurveItem(save.getId());
+        generateFourReview(save.getId());
         return BaseResponse.ok();
     }
 
@@ -72,6 +79,17 @@ public class ForgetCurveController {
         int finish = forgetCurveItemRepository.finish(id, 1);
         Optional<ForgetCurveItem> optional = forgetCurveItemRepository.findById(id);
         Date nextReviewTime = forgetCurveItemRepository.findNextReviewTime(optional.get().getTargetId());
+        if (nextReviewTime == null) {
+            forgetCurveRepository.updateStatus(optional.get().getTargetId(), 1);
+        }
+        return "成功";
+    }
+
+    @GetMapping("/fourReviewFinish")
+    public String fourReviewFinish(String id) {
+        int finish = fourReviewRepository.finish(id, 1);
+        Optional<FourReview> optional = fourReviewRepository.findById(id);
+        Date nextReviewTime = fourReviewRepository.findNextReviewTime(optional.get().getTargetId());
         if (nextReviewTime == null) {
             forgetCurveRepository.updateStatus(optional.get().getTargetId(), 1);
         }
@@ -108,6 +126,46 @@ public class ForgetCurveController {
         List<ForgetCurveItem> forgetCurveItemList = forgetCurveItemRepository.findAll(example);
         List<ForgetCurveModel> forgetCurveModels = forgetCurveItemList.stream().map(o -> convert(o, optional.get())).collect(Collectors.toList());
         return forgetCurveModels;
+    }
+
+    @GetMapping("/fourReview")
+    public List<FourReviewModel> fourReview(String id) {
+        Optional<ForgetCurve> optional = forgetCurveRepository.findById(id);
+        if (!optional.isPresent()) {
+            return new ArrayList<>();
+        }
+        FourReview fourReview = new FourReview();
+        fourReview.setTargetId(optional.get().getId());
+        //创建实例
+        Example<FourReview> example = Example.of(fourReview);
+        List<FourReview> fourReviewList = fourReviewRepository.findAll(example);
+
+        List<FourReviewModel> fourReviewModels = fourReviewList.stream().map(o -> convert(o, optional.get())).collect(Collectors.toList());
+        return fourReviewModels;
+    }
+
+    public FourReviewModel convert(FourReview fourReview, ForgetCurve forgetCurve) {
+        FourReviewModel fourReviewModel = new FourReviewModel();
+        fourReviewModel.setTarget(forgetCurve.getTarget());
+        fourReviewModel.setDescription(forgetCurve.getDescription());
+        fourReviewModel.setTargetId(fourReview.getTargetId());
+        fourReviewModel.setForgetCurveItemId(fourReview.getId());
+        fourReviewModel.setCycle(fourReview.getCycle());
+        fourReviewModel.setDateTime(fourReview.getDateTime());
+        fourReviewModel.setStatus(fourReview.getStatus());
+        switch (fourReview.getStatus()) {
+            case 0:
+                fourReviewModel.setStatus_text("未完成");
+                break;
+            case 1:
+                fourReviewModel.setStatus_text("已完成");
+                break;
+            case 2:
+                fourReviewModel.setStatus_text("已过期");
+                break;
+            default:
+        }
+        return fourReviewModel;
     }
 
     public MemoryTaskModel convertMemoryTask(ForgetCurve forgetCurve) {
@@ -183,6 +241,29 @@ public class ForgetCurveController {
         instance.add(Calendar.DAY_OF_MONTH, 8);
         cover(7, id, instance.getTime());
     }
+
+    private void generateFourReview(String id) {
+        Calendar instance = Calendar.getInstance();
+        instance.add(Calendar.HOUR, 24);
+        coverFourReview(1, id, instance.getTime());
+        instance.add(Calendar.DAY_OF_MONTH, 7);
+        coverFourReview(2, id, instance.getTime());
+        instance.add(Calendar.DAY_OF_MONTH, 14);
+        coverFourReview(3, id, instance.getTime());
+        instance.add(Calendar.MONTH, 1);
+        coverFourReview(4, id, instance.getTime());
+    }
+
+    private void coverFourReview(int cycle, String id, Date time) {
+        FourReview fourReview = new FourReview();
+        fourReview.setCycle(cycle);
+        fourReview.setTargetId(id);
+        fourReview.setDateTime(time);
+        fourReview.setStatus(0);
+        FourReview save = fourReviewRepository.save(fourReview);
+    }
+
+
 
     private void cover(int cycle, String id, Date time) {
         ForgetCurveItem forgetCurveItem = new ForgetCurveItem();
