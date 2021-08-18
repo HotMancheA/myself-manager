@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : wind
+ Source Server         : yuan
  Source Server Type    : MySQL
  Source Server Version : 50540
- Source Host           : localhost:3306
+ Source Host           : 120.78.67.40:3306
  Source Schema         : forget_curve
 
  Target Server Type    : MySQL
  Target Server Version : 50540
  File Encoding         : 65001
 
- Date: 04/05/2021 18:06:47
+ Date: 18/08/2021 22:44:36
 */
 
 SET NAMES utf8mb4;
@@ -54,6 +54,30 @@ CREATE TABLE `forget_curve_item`  (
   `status` int(1) NOT NULL COMMENT '状态',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+
+-- ----------------------------
+-- Table structure for four_review
+-- ----------------------------
+DROP TABLE IF EXISTS `four_review`;
+CREATE TABLE `four_review`  (
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'ID',
+  `target_id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '目标',
+  `cycle` int(1) NOT NULL COMMENT '周期',
+  `date_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` int(1) NOT NULL COMMENT '状态',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+
+-- ----------------------------
+-- Table structure for learn_time
+-- ----------------------------
+DROP TABLE IF EXISTS `learn_time`;
+CREATE TABLE `learn_time`  (
+  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT 'ID',
+  `learn_name` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '学习名称',
+  `learn_time` int(5) NULL DEFAULT 0 COMMENT '学习时长（分）',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '学习时长' ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Table structure for tiny_habit
