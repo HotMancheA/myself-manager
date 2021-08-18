@@ -70,6 +70,7 @@ public class ForgetCurveController {
         for (String id : ids) {
             forgetCurveRepository.deleteById(id);
             forgetCurveItemRepository.deleteForgetCurveItemByTargetId(id);
+            fourReviewRepository.deleteFourReviewByTargetId(id);
         }
         return BaseResponse.ok();
     }

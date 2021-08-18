@@ -129,6 +129,7 @@
                 forgetItemVisible: false,
                 editTitle: '新增',
                 pageTotal: 0,
+                fourReviewFlag:false,
                 forgetForm: {
                     'orderNum': 0,
                     'state': 0
@@ -256,8 +257,11 @@
 
             },
             fourReview(id) {
-                
-this.$message.success(id);
+                this.forgetItemVisible = true;
+                forgetApi.getForgetFourData(id).then((res) => {
+                    this.forgetItemData = res;
+                    this.fourReviewFlag = true;
+                })
             },
             getForgetItem(id) {
                 this.forgetItemVisible = true;
@@ -266,10 +270,17 @@ this.$message.success(id);
                 })
             },
             finish(row) {
-                forgetApi.finish(row.forgetCurveItemId).then((res) => {
-                    this.$message.success(res);
-                    this.getForgetItem(row.targetId);
-                })
+                if(this.fourReviewFlag){
+                    forgetApi.finishFour(row.forgetCurveItemId).then((res) => {
+                        this.$message.success(res);
+                        this.fourReview(row.targetId);
+                    })
+                }else{
+                    forgetApi.finish(row.forgetCurveItemId).then((res) => {
+                        this.$message.success(res);
+                        this.getForgetItem(row.targetId);
+                    })
+                }
             },
             tableRowClassName({
                 row
@@ -292,6 +303,7 @@ this.$message.success(id);
             handleClose() {
                 this.forgetItemVisible = false;
                 this.getForgetData();
+                this.fourReviewFlag = false;
             }
         }
     };

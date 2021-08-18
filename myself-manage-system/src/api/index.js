@@ -28,10 +28,16 @@ export const getForgetItemData = (id) => {
     return http.requestQuickGet(domain + "/yuman/forgetCurve/listItem?id=" + id)
 }
 
+export const getForgetFourData = (id) => {
+    return http.requestQuickGet(domain + "/yuman/forgetCurve/fourReview?id=" + id)
+}
+
 export const finish = (id) => {
     return http.requestQuickGet(domain + "/yuman/forgetCurve/finish?id=" + id)
 }
-
+export const finishFour = (id) => {
+    return http.requestQuickGet(domain + "/yuman/forgetCurve/fourReviewFinish?id=" + id)
+}
 // ================记忆任务 结束==================
 
 // ================微习惯 开始==================
