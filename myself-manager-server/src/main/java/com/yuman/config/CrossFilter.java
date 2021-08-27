@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-public class CORSFilter implements Filter {
+public class CrossFilter implements Filter {
 
 
     @Override

@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @EnableTransactionManagement
-@MapperScan("com.yuman.mapper")
 @EnableScheduling
 public class ServerApplication {
     public static void main(String[] args) {
