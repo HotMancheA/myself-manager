@@ -19,7 +19,7 @@ public class QueryHelp {
 
     private static Pattern humpPattern = Pattern.compile("[A-Z]");
 
-    public static <R, Q> QueryWrapper<R> getQueryWrapper(Q query, R r) {
+    public static <R, Q> QueryWrapper<R> getQueryWrapper(Q query, Class<R> rClass) {
         QueryWrapper<R> queryWrapper = new QueryWrapper<>();
         if (query == null) {
             return queryWrapper;
